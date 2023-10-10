@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"io"
+	"net"
 	"os"
 	"os/signal"
 	"path/filepath"
@@ -122,6 +123,12 @@ func readConfigAndMerge() (option.Options, error) {
 	return mergedOptions, nil
 }
 
+func checkInternetConnection() bool {
+	timeout := 5 * time.Second
+	_, err := net.DialTimeout("tcp", "8.8.8.8:53", timeout)
+	return err == nil
+}
+
 func create() (*box.Box, context.CancelFunc, error) {
 	options, err := readConfigAndMerge()
 	if err != nil {
@@ -170,27 +177,51 @@ func run() error {
 	osSignals := make(chan os.Signal, 1)
 	signal.Notify(osSignals, os.Interrupt, syscall.SIGTERM, syscall.SIGHUP)
 	defer signal.Stop(osSignals)
+
 	for {
 		instance, cancel, err := create()
 		if err != nil {
 			return err
 		}
 		runtimeDebug.FreeOSMemory()
+
+		go func() {
+			for {
+				time.Sleep(10 * time.Second)
+				if !checkInternetConnection() {
+					log.Warn("No internet connection, triggering reload...")
+					cancel()
+					break
+				}
+			}
+		}()
+
 		for {
-			osSignal := <-osSignals
-			if osSignal == syscall.SIGHUP {
+			reloadTag := false
+			select {
+			case osSignal := <-osSignals:
+				if osSignal == syscall.SIGHUP {
+					err = check()
+					if err != nil {
+						log.Error(E.Cause(err, "reload service"))
+						continue
+					}
+					reloadTag = true
+				}
+			case <-instance.ReloadChan():
 				err = check()
 				if err != nil {
 					log.Error(E.Cause(err, "reload service"))
 					continue
 				}
+				reloadTag = true
 			}
 			cancel()
 			closeCtx, closed := context.WithCancel(context.Background())
 			go closeMonitor(closeCtx)
 			err = instance.Close()
 			closed()
-			if osSignal != syscall.SIGHUP {
+			if !reloadTag {
 				if err != nil {
 					log.Error(E.Cause(err, "sing-box did not closed properly"))
 				}
