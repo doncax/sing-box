@@ -848,6 +848,7 @@ func (r *Router) RouteConnection(ctx context.Context, conn net.Conn, metadata ad
 			Fqdn: domain,
 			Port: metadata.Destination.Port,
 		}
+		metadata.DNSMode = C.DNSModeFakeIP
 		metadata.FakeIP = true
 		r.logger.DebugContext(ctx, "found fakeip domain: ", domain)
 	}
@@ -972,6 +973,7 @@ func (r *Router) RoutePacketConnection(ctx context.Context, conn N.PacketConn, m
 			Fqdn: domain,
 			Port: metadata.Destination.Port,
 		}
+		metadata.DNSMode = C.DNSModeFakeIP
 		metadata.FakeIP = true
 		r.logger.DebugContext(ctx, "found fakeip domain: ", domain)
 	}
