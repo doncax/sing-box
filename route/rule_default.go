@@ -206,7 +206,7 @@ func NewDefaultRule(ctx context.Context, router adapter.Router, logger log.Conte
 		rule.items = append(rule.items, item)
 		rule.allItems = append(rule.allItems, item)
 	}
-	if options.ClashMode != "" {
+	if len(options.ClashMode) > 0 {
 		item := NewClashModeItem(router, options.ClashMode)
 		rule.items = append(rule.items, item)
 		rule.allItems = append(rule.allItems, item)
