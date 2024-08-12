@@ -26,6 +26,7 @@ type configSchema struct {
 	AllowLan    bool   `json:"allow-lan"`
 	BindAddress string `json:"bind-address"`
 	Mode        string `json:"mode"`
+	Modes       []string `json:"modes"`
 	// sing-box added
 	ModeList []string       `json:"mode-list"`
 	LogLevel string         `json:"log-level"`
@@ -43,6 +44,8 @@ func getConfigs(server *Server, logFactory log.Factory) func(w http.ResponseWrit
 		}
 		render.JSON(w, r, &configSchema{
 			Mode:        server.mode,
+			Modes:       server.modeList,
+			AllowLan:    true,
 			ModeList:    server.modeList,
 			BindAddress: "*",
 			LogLevel:    log.FormatLevel(logLevel),
