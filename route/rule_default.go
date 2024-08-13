@@ -48,8 +48,9 @@ type RuleItem interface {
 func NewDefaultRule(ctx context.Context, router adapter.Router, logger log.ContextLogger, options option.DefaultRule) (*DefaultRule, error) {
 	rule := &DefaultRule{
 		abstractDefaultRule{
-			invert:   options.Invert,
-			outbound: options.Outbound,
+			invert:      options.Invert,
+			skipResolve: options.SkipResolve,
+			outbound:    options.Outbound,
 		},
 	}
 	if len(options.Inbound) > 0 {
@@ -232,6 +233,7 @@ func NewDefaultRule(ctx context.Context, router adapter.Router, logger log.Conte
 		}
 		item := NewRuleSetItem(router, options.RuleSet, matchSource, false)
 		rule.items = append(rule.items, item)
+		rule.ruleSetItems = append(rule.ruleSetItems, item)
 		rule.allItems = append(rule.allItems, item)
 	}
 	return rule, nil
@@ -246,9 +248,10 @@ type LogicalRule struct {
 func NewLogicalRule(ctx context.Context, router adapter.Router, logger log.ContextLogger, options option.LogicalRule) (*LogicalRule, error) {
 	r := &LogicalRule{
 		abstractLogicalRule{
-			rules:    make([]adapter.HeadlessRule, len(options.Rules)),
-			invert:   options.Invert,
-			outbound: options.Outbound,
+			rules:       make([]adapter.HeadlessRule, len(options.Rules)),
+			invert:      options.Invert,
+			skipResolve: options.SkipResolve,
+			outbound:    options.Outbound,
 		},
 	}
 	switch options.Mode {
