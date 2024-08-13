@@ -47,6 +47,7 @@ func getConfigs(server *Server, logFactory log.Factory) func(w http.ResponseWrit
 			Modes:       server.modeList,
 			AllowLan:    true,
 			ModeList:    server.modeList,
+			AllowLan:    true,
 			BindAddress: "*",
 			LogLevel:    log.FormatLevel(logLevel),
 		})
