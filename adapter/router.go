@@ -114,11 +114,11 @@ type DNSRule interface {
 
 type RuleSet interface {
 	Name() string
+	StartContext(ctx context.Context, startContext *HTTPStartContext) error
 	Type() string
 	Format() string
 	UpdatedTime() time.Time
 	Update(ctx context.Context) error
-	StartContext(ctx context.Context, startContext RuleSetStartContext) error
 	PostStart() error
 	Metadata() RuleSetMetadata
 	ExtractIPSet() []*netipx.IPSet

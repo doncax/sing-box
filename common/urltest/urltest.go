@@ -136,6 +136,6 @@ func URLTest(ctx context.Context, link string, detour N.Dialer) (t uint16, err e
 		return
 	}
 
-	t = (delay1 + delay2) / 10
+	t = (delay1 + delay2) / 5
 	return
 }

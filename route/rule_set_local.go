@@ -69,7 +69,7 @@ func NewLocalRuleSet(ctx context.Context, router adapter.Router, logger logger.C
 	return ruleSet, nil
 }
 
-func (s *LocalRuleSet) StartContext(ctx context.Context, startContext adapter.RuleSetStartContext) error {
+func (s *LocalRuleSet) StartContext(ctx context.Context, startContext *adapter.HTTPStartContext) error {
 	if s.watcher != nil {
 		err := s.watcher.Start()
 		if err != nil {

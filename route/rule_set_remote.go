@@ -169,7 +169,7 @@ func (s *RemoteRuleSet) Update(ctx context.Context) error {
 	return nil
 }
 
-func (s *RemoteRuleSet) fetchOnce(ctx context.Context, startContext adapter.RuleSetStartContext) error {
+func (s *RemoteRuleSet) fetchOnce(ctx context.Context, startContext *adapter.HTTPStartContext) error {
 	s.logger.DebugContext(ctx, "updating rule-set ", s.tag, " from URL: ", s.options.URL)
 	var httpClient *http.Client
 	if startContext != nil {
